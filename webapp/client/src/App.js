@@ -21,12 +21,16 @@ class App extends Component {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.state = {
-      submitted: false
+      submitted: false,
+      isLoading: false,
+      data: null,
+      sentiment: null,
+      text: null
     };
   }
 
   handleSubmit() {
-    this.setState({submitted: true});
+    this.setState({submitted: true, isLoading: true});
   }
 
   render() {
@@ -35,16 +39,16 @@ class App extends Component {
     let instruction;
 
     if (isSubmitted) {
-      instruction = <Empty style={{height:"auto", width:"95%", textAlign: "center"}}
-        image="./loading.gif"
-        imageStyle={{height:"20vw", width:"20vw", display: "block", margin: "20vh auto 0 auto"}}
-        description={
-          <h1>
-            Loading...
-          </h1>
-          }
-        >
-        </Empty>;
+        instruction = <Empty style={{height:"auto", width:"95%", textAlign: "center"}}
+          image="./loading.gif"
+          imageStyle={{height:"20vw", width:"20vw", display: "block", margin: "20vh auto 0 auto"}}
+          description={
+            <h1>
+              Loading...
+            </h1>
+            }
+          >
+          </Empty>
     } else {
       instruction = <Empty style={{height:"auto", width:"95%", textAlign: "center"}}
         imageStyle={{height:"20vw", width:"20vw", display: "block", margin: "20vh auto 0 auto"}}
