@@ -1,3 +1,5 @@
 *.DS_*
-
+.*
+glove*
+test*
 .ipynb_checkpoints/
