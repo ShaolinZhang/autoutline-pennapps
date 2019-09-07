@@ -4,6 +4,8 @@ from flask import jsonify
 
 server = flask.Flask(__name__)
 
+from google.cloud import language_v1
+from google.cloud.language_v1 import enums
 import numpy as np
 import pandas as pd
 import re
@@ -20,7 +22,7 @@ stop_words = stopwords.words('english')
 # Get pre-trained word_embeddings from glove
 def get_word_embeddings():
 	word_embeddings = {}
-	f = open('../w2vdata/glove.6B.100d.txt', encoding='utf-8')
+	f = open('../w2vdata/glove.6B.300d.txt', encoding='utf-8')
 	for line in f:
 	    values = line.split()
 	    word = values[0]
@@ -55,9 +57,9 @@ def get_sentence_vectors(sentences):
 	sentence_vectors = []
 	for i in sentences:
 	    if len(i) != 0:
-	        v = sum([word_embeddings.get(w, np.zeros((100,))) for w in i.split()])/(len(i.split())+0.001)
+	        v = sum([word_embeddings.get(w, np.zeros((300,))) for w in i.split()])/(len(i.split())+0.001)
 	    else:
-	        v = np.zeros((100,))
+	        v = np.zeros((300,))
 	    sentence_vectors.append(v)
 	return sentence_vectors
 
@@ -101,14 +103,46 @@ def get_outline():
     for i in range(len(sentences)):
 	    for j in range(len(sentences)):
 	        if i != j:
-	            sim_mat[i][j] = cosine_similarity(sentence_vectors[i].reshape(1,100), sentence_vectors[j].reshape(1,100))[0,0]
+	            sim_mat[i][j] = cosine_similarity(sentence_vectors[i].reshape(1,300), sentence_vectors[j].reshape(1,300))[0,0]
 
     # calculate page rank values
     nx_graph = nx.from_numpy_array(sim_mat)
     scores = nx.pagerank(nx_graph)
 
-    return jsonify(titles=findTitles(scores, sentences))
+    # calculate sentiment
+    client = language_v1.LanguageServiceClient().from_service_account_json("google_credentials.json")
+    type_ = enums.Document.Type.PLAIN_TEXT
+    language = "en"
+    document = {"content": raw_string, "type": type_, "language": language}
+    encoding_type = enums.EncodingType.UTF8
+    response = client.analyze_sentiment(document, encoding_type=encoding_type)
 
+    return jsonify(titles=findTitles(scores, sentences),
+    				sentiment=response.document_sentiment.score)
+
+@server.route('/get_keyword', methods=['GET', 'POST'])
+def get_keyword():
+	req_data = request.get_json()
+	raw_string = req_data['text'].replace('\n', ' ')
+
+	client = language_v1.LanguageServiceClient().from_service_account_json("google_credentials.json")
+	type_ = enums.Document.Type.PLAIN_TEXT
+	language = "en"
+	document = {"content": raw_string, "type": type_, "language": language}
+	encoding_type = enums.EncodingType.UTF8
+	response = client.analyze_entities(document, encoding_type=encoding_type)
+
+	word_salience = []
+	for entity in response.entities:
+	    word_salience.append((entity.name, entity.salience))
+	sorted_salience = sorted(word_salience, key=lambda x: x[1], reverse=True)
+
+	important_words = []
+
+	for i in range(min(5, len(sorted_salience))):
+	    important_words.append(sorted_salience[i][0])
+
+	return jsonify(words=important_words)
 
 
 if __name__ == '__main__':
