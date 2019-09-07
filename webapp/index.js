@@ -2,11 +2,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+// import routes
+const outlineRoutes = require('./routes/outlines.js');
+
 const app = express();
 
 app.use(bodyParser.json());
 app.use(cors({ origin: 'http://localhost:8000', credentials: true }));
 
+app.use('/outlines', outlineRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('client/build'));
