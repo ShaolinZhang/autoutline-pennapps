@@ -20,3 +20,8 @@ services:
       context: ./client
     volumes:
       - /app/node_modules
+      - ./client:/app
+  analyzer:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./analyzer
