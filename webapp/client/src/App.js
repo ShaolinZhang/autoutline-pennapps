@@ -1,6 +1,5 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Row, Layout, Col, Input, Button, List } from 'antd';
+import React, { Component } from 'react';
+import { Row, Layout, Col, Input, Button, List, Empty } from 'antd';
 import 'antd/dist/antd.css';
 import './App.css';
 
@@ -16,41 +15,73 @@ const listData = [
   'Los Angeles battles huge wildfires.',
 ];
 
-function App() {
-  return (
-    <div className="App" style={{height:"100vh"}}>
-    <Layout className="layout" style={{height:"6vh"}}>
-      <Header>
-        <div className="logo" />
-      </Header>
-      <Row>
-        <Col span={12} style={{height:"92vh"}}>
-          <TextArea
-            placeholder="Hi there"
-            style={{height:"80%", width:"90%", margin:"20px 20px 0px 20px", resize:"none"}}
-          />
-          <div style={{textAlign: "center"}}>
-            <Button type="primary" size={"large"} style={{margin:"20px 20px 20px 20px"}}>
-              Submit
-            </Button>
-          </div>
-        </Col>
-        <Col span={12} style={{height:"92vh"}}>
-          <List
-            style={{width:"90%", margin:"20px 20px 0px 20px", float:"left"}}
-            bordered
-            dataSource={listData}
-            renderItem={item => (
-              <List.Item>
-                {item}
-              </List.Item>
-            )}
-          />
+class App extends Component {
+
+  constructor(props) {
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.state = {
+      submitted: false
+    };
+  }
+
+  handleSubmit() {
+    this.setState({submitted: true});
+  }
+
+  render() {
+
+    const isSubmitted = this.state.submitted;
+    let instruction;
+
+    if (isSubmitted) {
+      instruction = <Empty style={{height:"auto", width:"95%", textAlign: "center"}}
+        image="./loading.gif"
+        imageStyle={{height:"20vw", width:"20vw", display: "block", margin: "20vh auto 0 auto"}}
+        description={
+          <h1>
+            Loading...
+          </h1>
+          }
+        >
+        </Empty>;
+    } else {
+      instruction = <Empty style={{height:"auto", width:"95%", textAlign: "center"}}
+        imageStyle={{height:"20vw", width:"20vw", display: "block", margin: "20vh auto 0 auto"}}
+        description={
+          <h1>
+            ← Feed me some text!
+            </h1>
+          }
+        >
+  </Empty>
+    }
+    return (
+      <div className="App" style={{height:"100vh"}}>
+        <Layout className="layout" style={{height:"6vh"}}>
+          <Header>
+            <p style={{fontSize: "1.5em", color: "white"}}> AutoOutline </p>
+          </Header>
+        </Layout>
+        <Row>
+          <Col span={12} style={{height:"92vh"}}>
+            <div style={{textAlign: "center", height:"90vh"}}>
+              <TextArea
+                placeholder="I'm gonna do a magic trick..."
+                style={{height:"90%", width:"90%", margin:"20px 20px 0px 20px", resize:"none", fontSize: "1.5em"}}
+              />
+              <Button type="primary" size={"large"} style={{margin:"20px 20px 20px 20px", padding:"0 10vw 0 10vw"}} onClick={this.handleSubmit}>
+                Submit
+              </Button>
+            </div>
+          </Col>
+          <Col span={12} style={{height:"92vh"}}>
+            {instruction}
         </Col>
       </Row>
-    </Layout>
     </div>
-  );
+    );
+  }
 }
 
 export default App;

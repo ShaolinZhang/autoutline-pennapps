@@ -31,3 +31,23 @@
     transform: rotate(360deg);
   }
 }
+
+.logo {
+  width: 120px;
+  height: 31px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px 24px 16px 0;
+  float: left;
+}
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 20vw;
+}
+
+h1 {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+}
