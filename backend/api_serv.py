@@ -5,7 +5,9 @@ server = flask.Flask(__name__)
 
 @server.route('/get_outline', methods=['get', 'post'])
 def get_outline():
-    raw_text = request.values.get('text')
+    req_data = request.get_json()
+
+    raw_text = req_data['text']
 
     return raw_text
 
