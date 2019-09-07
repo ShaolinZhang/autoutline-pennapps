@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Row, Layout, Col, Input, Button, List, Empty } from 'antd';
 import 'antd/dist/antd.css';
 import './App.css';
+import axios from 'axios';
 
 const { Header, Content, Footer } = Layout;
 
@@ -19,18 +20,30 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.handleSubmit = this.handleSubmit.bind(this);
     this.state = {
       submitted: false,
       isLoading: false,
       data: null,
       sentiment: null,
-      text: null
+      text: ''
     };
   }
 
   handleSubmit() {
+    axios.post('/api/outlines', {
+      text: this.state.text
+    })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
     this.setState({submitted: true, isLoading: true});
+  }
+
+  handleReset() {
+    this.setState({submitted:false, isLoading: false});
   }
 
   render() {
@@ -43,9 +56,9 @@ class App extends Component {
           image="./loading.gif"
           imageStyle={{height:"20vw", width:"20vw", display: "block", margin: "20vh auto 0 auto"}}
           description={
-            <h1>
+            <span style={{fontSize: "1.5em", marginBottom: "20px"}}>
               Loading...
-            </h1>
+            </span>
             }
           >
           </Empty>
@@ -53,12 +66,12 @@ class App extends Component {
       instruction = <Empty style={{height:"auto", width:"95%", textAlign: "center"}}
         imageStyle={{height:"20vw", width:"20vw", display: "block", margin: "20vh auto 0 auto"}}
         description={
-          <h1>
+          <span style={{fontSize: "1.5em", marginBottom: "20px"}}>
             ← Feed me some text!
-            </h1>
+          </span>
           }
         >
-  </Empty>
+      </Empty>
     }
     return (
       <div className="App" style={{height:"100vh"}}>
@@ -71,11 +84,16 @@ class App extends Component {
           <Col span={12} style={{height:"92vh"}}>
             <div style={{textAlign: "center", height:"90vh"}}>
               <TextArea
+                onChange={(e) => this.setState({ "text": e.target.value })}
+                value={this.state.text}
                 placeholder="I'm gonna do a magic trick..."
                 style={{height:"90%", width:"90%", margin:"20px 20px 0px 20px", resize:"none", fontSize: "1.5em"}}
               />
-              <Button type="primary" size={"large"} style={{margin:"20px 20px 20px 20px", padding:"0 10vw 0 10vw"}} onClick={this.handleSubmit}>
+            <Button type="primary" size={"large"} style={{margin:"20px 20px 20px 20px", padding:"0 5vw 0 5vw"}} onClick={this.handleSubmit.bind(this)}>
                 Submit
+              </Button>
+              <Button size={"large"} style={{margin:"20px 20px 20px 20px", padding:"0 5vw 0 5vw"}} onClick={this.handleReset.bind(this)}>
+                Reset
               </Button>
             </div>
           </Col>
