@@ -1,7 +1,7 @@
-FROM continuumio/miniconda3
+FROM continuumio/miniconda:4.7.10
+RUN conda init
 WORKDIR "/app"
-COPY ./environment.yaml ./
-RUN conda create -f environment.yaml
-RUN conda activate pennapps
+COPY ./environment.yml ./
+RUN conda env create -f environment.yml
 COPY ./ ./
-CMD ["python", "api_serv.py"]
+CMD ["conda", "run", "-n", "analyzer", "python", "api_serv.py"]

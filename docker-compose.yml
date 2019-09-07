@@ -13,7 +13,7 @@ services:
       context: ./apiserver
     volumes:
       - /app/node_modules
-      - ./server:/app
+      - ./apiserver:/app
   client:
     build:
       dockerfile: Dockerfile.dev
