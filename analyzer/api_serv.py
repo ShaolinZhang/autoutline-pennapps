@@ -14,15 +14,22 @@ import networkx as nx
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize
+
+from prepare_glove import *
+
 nltk.download('punkt')
 nltk.download('stopwords')
-
 stop_words = stopwords.words('english')
+
+# define remove stop words
+def remove_stopwords(sen):
+    sen_new = " ".join([i for i in sen if i not in stop_words])
+    return sen_new
 
 # Get pre-trained word_embeddings from glove
 def get_word_embeddings():
 	word_embeddings = {}
-	f = open('../w2vdata/glove.6B.300d.txt', encoding='utf-8')
+	f = open('glove/glove.twitter.27B.200d.txt', encoding='utf-8')
 	for line in f:
 	    values = line.split()
 	    word = values[0]
@@ -30,13 +37,8 @@ def get_word_embeddings():
 	    word_embeddings[word] = coefs
 	f.close()
 	return word_embeddings
-
+	
 word_embeddings = get_word_embeddings()
-
-# define remove stop words
-def remove_stopwords(sen):
-    sen_new = " ".join([i for i in sen if i not in stop_words])
-    return sen_new
 
 # define tokenize string to sentences
 def tokenize(string):
@@ -57,9 +59,9 @@ def get_sentence_vectors(sentences):
 	sentence_vectors = []
 	for i in sentences:
 	    if len(i) != 0:
-	        v = sum([word_embeddings.get(w, np.zeros((300,))) for w in i.split()])/(len(i.split())+0.001)
+	        v = sum([word_embeddings.get(w, np.zeros((200,))) for w in i.split()])/(len(i.split())+0.001)
 	    else:
-	        v = np.zeros((300,))
+	        v = np.zeros((200,))
 	    sentence_vectors.append(v)
 	return sentence_vectors
 
@@ -103,7 +105,7 @@ def get_outline():
     for i in range(len(sentences)):
 	    for j in range(len(sentences)):
 	        if i != j:
-	            sim_mat[i][j] = cosine_similarity(sentence_vectors[i].reshape(1,300), sentence_vectors[j].reshape(1,300))[0,0]
+	            sim_mat[i][j] = cosine_similarity(sentence_vectors[i].reshape(1,200), sentence_vectors[j].reshape(1,200))[0,0]
 
     # calculate page rank values
     nx_graph = nx.from_numpy_array(sim_mat)
@@ -146,4 +148,6 @@ def get_keyword():
 
 
 if __name__ == '__main__':
-    server.run(debug=True, port=8000, host='0.0.0.0')
+	download_glove()
+	server.run(debug=True, port=8000, host='0.0.0.0')
+
