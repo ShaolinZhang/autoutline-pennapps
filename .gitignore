@@ -1,1 +1,3 @@
 *.DS_*
+
+.ipynb_checkpoints/
