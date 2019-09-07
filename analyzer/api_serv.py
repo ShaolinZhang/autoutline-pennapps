@@ -123,10 +123,10 @@ def findTitles(scores, sentences):
         }
         returned.append(newTitle)
         left = right
-        if top_sentences[i + 1] == top_sentences[-1]:
-            right = len(sentences) - 1
-        else:
-            right = mid_point[i + 1]
+        if i == len(top_sentences)-2:
+            right = len(sentences)
+        elif not i == len(top_sentences)-1:
+            right = mid_point[i + 1] 
 
     return returned
 
