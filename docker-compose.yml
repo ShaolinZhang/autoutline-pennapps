@@ -1,0 +1,15 @@
+version: '3'
+services:
+  apiserver:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./apiserver
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+  client:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - /app/node
