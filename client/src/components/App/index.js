@@ -62,15 +62,15 @@ class App extends Component {
     this.setState({isLoading: true});
 
     axios
-      .post("https://18.219.26.6:8000/get_outline", {
+      .post("http://18.219.26.6:8000/get_outline", {
         text: this.state.text
       })
       .then(response => {
         console.log("response data:", response.data);
         this.setState({ data: response.data, isLoading: false, isEditable: false });
         let selected_ind = [];
-        for (var i = 0; i < response.data.topics.length; i++) {
-          selected_ind.push(response.data.topics[i].ind);
+        for (var i = 0; i < response.data.titles.length; i++) {
+          selected_ind.push(response.data.titles[i].ind);
         }
         this.setState({selected_ind: selected_ind, sentiment: (response.data.sentiment + 1) * 50});
       })
@@ -92,19 +92,20 @@ class App extends Component {
     this.setState({hover: [-1,-1]})
   }
 
-  handleKeywordSearch(range) {
+  async handleKeywordSearch(range, cb) {
     let text = ''
     let i = range[0]
     for (; i<range[1]; i++){
       text = text + this.state.sentences[i]
     }
+
     axios
       .post("http://18.219.26.6:8000/get_keyword", {
         text: text
       })
       .then(response => {
-        console.log("keyword response data:", response.data);
-        return response.data.words
+        console.log("keyword response data:", response.data.words);
+        cb(response.data.words);
       })
       .catch(() => {
         console.log("response error!!!");
