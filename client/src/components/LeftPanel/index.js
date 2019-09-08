@@ -9,6 +9,7 @@ class LeftPanel extends Component {
         text={this.props.text}
         onChange={e => this.props.onChange(e)}
         onSubmit={() => this.props.onSubmit()}
+        onEdit={() => this.props.onEdit()}
       />
     );
   }

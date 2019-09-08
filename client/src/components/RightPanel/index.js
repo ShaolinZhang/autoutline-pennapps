@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { List } from "antd";
 
 import Loading from "../Loading";
 import Welcome from "../Welcome";

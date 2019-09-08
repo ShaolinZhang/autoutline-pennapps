@@ -29,6 +29,16 @@ const TextEdit = props => {
       >
         Submit
       </Button>
+      <Button
+        size={"large"}
+        style={{
+          margin: "20px 20px 20px 20px",
+          padding: "0 5vw 0 5vw"
+        }}
+        onClick={() => props.onEdit()}
+      >
+        Edit
+      </Button>
     </div>
   );
 };
