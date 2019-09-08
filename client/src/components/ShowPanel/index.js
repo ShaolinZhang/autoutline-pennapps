@@ -5,14 +5,15 @@ const showPanel = props => {
     let style = {}
 
     if (props.inds.includes(ind) && props.hover[0]<=ind && ind<props.hover[1]) {
-      style['color'] = "white"
-      style['backgroundColor'] = "#FFBA84"
+      style['color'] = "#9A2617"
     }
     else if (props.hover[0]<=ind && ind<props.hover[1]) {
-      style['backgroundColor'] = "#FFBA84"
+      style['color'] = "#9A2617"
     }
+     
     else if (props.inds.includes(ind)) {
-      style['color'] = "#EB7A77"
+      style['color'] = "white"
+      style['backgroundColor'] = "#43ABC9"
     }
 
     let p = <span style={style} key={ind} id={ind}>{line} </span>

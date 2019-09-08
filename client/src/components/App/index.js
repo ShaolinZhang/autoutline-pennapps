@@ -146,7 +146,6 @@ class App extends Component {
       hover={this.state.hover}
     />
 
-    console.log(this.state.sentences)
     return (
       <div className="App" style={{ height: "100vh" }}>
         <Layout className="layout" style={{ height: "6vh" }}>

@@ -37,7 +37,7 @@ class Result extends Component {
     return this.props.data.titles.map((topic, i) => (
       <Panel header={topic.string} key={i}
         style={{height: "100%", width: "90%", overflow:"scroll"}}>
-        <p style={{cursor: "pointer"}}
+        <p style={{cursor: "pointer", textAlign:"center"}}
           
           onClick={()=>this.props.clickHandler(topic.range[0], topic.range)}
           >
