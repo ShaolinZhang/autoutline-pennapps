@@ -1,22 +1,26 @@
 import React, { Component } from "react";
 
 import TextEdit from "../TextEdit";
-import ShowPanel from "../ShowPanel/ShowPanel";
+import ShowPanel from "../ShowPanel";
 import { Button } from "antd";
 
 class LeftPanel extends Component {
   render() {
     let left = this.props.isEditable ?
-      <TextEdit text={this.props.text}
+      <TextEdit
+        text={this.props.text}
         onChange={e => this.props.onChange(e)}/>
       :
-      <ShowPanel sentences={this.props.sentences}
+      <ShowPanel
+        sentences={this.props.sentences}
         inds={this.props.inds}
         hover={this.props.hover}/>
 
     return (
       <div style={{ textAlign: "center", height: "90vh" }}>
-        {left}
+        <div style={{ height: "80vh", margin:"2vh" }}>
+          {left}
+        </div>
         <Button
           type="primary"
           size={"large"}

@@ -21,18 +21,18 @@ class App extends Component {
       text: "",
       data: null,
       sentiment: 0,
-      text: "",
       sentences: [],
       selected_ind: [],
       hover: [-1,-1]
     };
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleHover = this.handleHover.bind(this)
-    this.handleUnHover = this.handleUnHover.bind(this)
+    this.handleHover = this.handleHover.bind(this);
+    this.handleUnHover = this.handleUnHover.bind(this);
+    this.handleKeywordSearch = this.handleKeywordSearch.bind(this);
   }
 
   handleSubmit() {
-    tokenizer.setEntry(this.state.text)
+    tokenizer.setEntry(this.state.text);
     this.setState({sentences: tokenizer.getSentences()});
     this.setState({ isLoading: true });
     axios
@@ -64,6 +64,13 @@ class App extends Component {
 
   handleUnHover() {
     this.setState({hover: [-1,-1]})
+  }
+
+  handleKeywordSearch() {
+    axios
+      .post("/api/keywords", {
+        // to be completed
+      });
   }
 
   render() {
