@@ -20,7 +20,6 @@ class App extends Component {
       isEditable: true,
       text: "",
       data: null,
-      outlines: [],
       sentiment: 0,
       text: "",
       sentences: [],
@@ -47,7 +46,7 @@ class App extends Component {
         for (var i = 0; i < response.data.topics.length; i++) {
           selected_ind.push(response.data.topics[i].ind);
         }
-        this.setState({selected_ind: selected_in, outlines: outlines, sentiment: (response.data.sentiment + 1) * 50});
+        this.setState({selected_ind: selected_ind, sentiment: (response.data.sentiment + 1) * 50});
       })
       .catch(() => {
         console.log("response error!!!");
