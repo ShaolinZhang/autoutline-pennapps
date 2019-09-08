@@ -18,10 +18,6 @@ const marks = {
 
 class Sentiment extends Component {
 
-  constructor(props) {
-    super(props);
-  }
-
   render() {
 
     return (
