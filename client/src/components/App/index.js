@@ -30,11 +30,11 @@ class App extends Component {
       .then(response => {
         console.log("response data:", response.data);
         this.setState({ data: response.data, isLoading: false, isEditable: false });
-        this.state.outlines = [];
+        var outlines = [];
         for (var i = 0; i < response.data.topics.length; i++) {
-          this.state.outlines.push(response.data.topics[i].string);
-          console.log(this.state.outlines);
+          outlines.push(response.data.topics[i].string);
         }
+        this.setState({outlines: outlines});
       })
       .catch(() => {
         console.log("response error!!!");

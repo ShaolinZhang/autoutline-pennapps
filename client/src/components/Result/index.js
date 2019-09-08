@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { List } from "antd";
+import { Collapse } from "antd";
 
-const data = ["Hello", "World"];
+const { Panel } = Collapse;
 
 class Result extends Component {
 
@@ -9,21 +9,23 @@ class Result extends Component {
     super(props);
   }
 
+  renderPanels() {
+    return this.props.outlines.map((outline, i) => {
+      return (
+        <Panel header={outline} key={i} style={{height: "100%", width: "90%"}}>
+          <p>Placeholder!</p>
+        </Panel>
+      )
+    })
+  }
+
   render() {
 
-    console.log(this.props.outlines);
-    return (<List
-      bordered
-      dataSource={data}
-      style={{height: "40vh",
-              width: "100%",
-              marginTop: "20vh"}}
-      renderItem={item => (
-        <List.Item>
-          {item}
-        </List.Item>
-      )}
-    />);
+    return (
+      <Collapse style={{marginTop: "5vh"}}>
+        {this.renderPanels()}
+      </Collapse>
+      );
   }
 }
 
