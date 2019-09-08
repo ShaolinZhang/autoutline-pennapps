@@ -14,13 +14,13 @@ class Result extends Component {
     }
 
     this.renderPanels = this.renderPanels.bind(this);
+    this.handleClick = this.handleClick.bind(this)
   }
 
 
   componentDidMount() {
     this.props.data.titles.forEach((topic, i) => {
       this.props.keywordHandler(topic.range, (words) => {
-        console.log("words", words);
         const newArr = [...this.state.listOfWords, {words: words, index: i}];
         newArr.sort((a, b) => a.index - b.index);
         this.setState({listOfWords: newArr});
@@ -28,21 +28,25 @@ class Result extends Component {
     })
   }
 
+  handleClick(i) {
+    document.getElementById(i).scrollIntoView(true);
+  }
+
   renderPanels() {
-    console.log('low', this.state.listOfWords);
     const l = this.state.listOfWords.length;
     return this.props.data.titles.map((topic, i) => (
       <Panel header={topic.string} key={i}
-        style={{height: "100%", width: "90%"}}>
-        <p
-          onMouseEnter={()=>this.props.hoverHandler(topic.range)}
-          onMouseLeave={()=>this.props.unHoverHandler()}
+        style={{height: "100%", width: "90%", overflow:"scroll"}}>
+        <p style={{cursor: "pointer"}}
+          
+          onClick={()=>this.props.clickHandler(topic.range[0], topic.range)}
           >
           {i < l ? this.state.listOfWords[i].words.join(', ') : ''}
         </p>
       </Panel>
     ));
   }
+  
 
   render() {
 
@@ -56,10 +60,11 @@ class Result extends Component {
           </div>
         </Row>
 
-        <Collapse style={{margin: "2vh 2vw 0 0", maxHeight: "60vh"}}>
+        <div style={{height: "70vh", overflow: "scroll"}}>
+        <Collapse style={{margin: "2vh 2vw 0 0"}}>
           {this.renderPanels()}
         </Collapse>
-
+        </div>
 
       </div>
     );

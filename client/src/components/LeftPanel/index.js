@@ -12,6 +12,7 @@ class LeftPanel extends Component {
         onChange={e => this.props.onChange(e)}/>
       :
       <ShowPanel
+        returns={this.props.returns}
         sentences={this.props.sentences}
         inds={this.props.inds}
         hover={this.props.hover}/>

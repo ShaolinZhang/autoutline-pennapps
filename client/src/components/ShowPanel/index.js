@@ -2,19 +2,25 @@ import React from "react";
 
 const showPanel = props => {
   let paragraphs = props.sentences.map((line, ind) => {
-    let p = <span key={ind}>{line} </span>
+    let style = {}
 
     if (props.inds.includes(ind) && props.hover[0]<=ind && ind<props.hover[1]) {
-      p = <span key={ind} style={{color:"#EB7A77",backgroundColor:"#FFBA84"}}>{line} </span>;
+      style['color'] = "white"
+      style['backgroundColor'] = "#FFBA84"
     }
     else if (props.hover[0]<=ind && ind<props.hover[1]) {
-      p = <span key={ind} style={{backgroundColor:"#FFBA84"}}>{line} </span>;
+      style['backgroundColor'] = "#FFBA84"
     }
-    else if (props.inds.includes(ind) ) {
-      p = <span key={ind} style={{color:"#EB7A77"}}>{line} </span>;
+    else if (props.inds.includes(ind)) {
+      style['color'] = "#EB7A77"
     }
 
+    let p = <span style={style} key={ind} id={ind}>{line} </span>
+    if (props.returns.includes(ind+1))
+      p= <div><span style={style} key={ind} id={ind}> {line} </span> <br/></div>
+
     return p
+    
   })
 
   return (

@@ -13,7 +13,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 import networkx as nx
 import nltk
 from nltk.corpus import stopwords
-from nltk.tokenize import sent_tokenize
 
 from prepare_glove import *
 
@@ -44,10 +43,25 @@ word_embeddings = get_word_embeddings()
 
 # define tokenize string to sentences
 def tokenize(string):
-	sentences = []
-	sentences.append(sent_tokenize(string))
-	sentences = [y for x in sentences for y in x]
-	return sentences
+    stop_chars = ['.', '!', '?']
+    sentences = []
+    left=0
+    right=0
+    count = 0
+    i = 0
+    while i < len(text):
+        if (stop_chars.includes(text.charAt(i))):
+            sentences.append(text[left:right+2])
+            left = right+2
+            count = count + 1
+        
+        right=i
+        if (text.charAt(i)=='\n'):
+            i = i+1
+        i = i+1
+
+    return sentences
+  
 
 # define clean sentences, remove char other than alphabets, tolower(), remove stopwords
 def clean_sentences(sentences):

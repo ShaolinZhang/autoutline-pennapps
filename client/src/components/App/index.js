@@ -66,7 +66,6 @@ class App extends Component {
         text: this.state.text
       })
       .then(response => {
-        console.log("response data:", response.data);
         this.setState({ data: response.data, isLoading: false, isEditable: false });
         let selected_ind = [];
         for (var i = 0; i < response.data.titles.length; i++) {
@@ -82,6 +81,16 @@ class App extends Component {
 
   handleEdit() {
     this.setState({ data: null, isLoading: false, isEditable: true });
+  }
+
+  handleClick(i, range) {
+    document.getElementById(i).scrollIntoView(true);
+    if (this.state.hover === range){
+      this.setState({hover: [-1,-1]})
+    }
+    else{
+      this.setState({hover: range})
+    }
   }
 
   handleHover(range) {
@@ -104,7 +113,6 @@ class App extends Component {
         text: text
       })
       .then(response => {
-        console.log("keyword response data:", response.data.words);
         cb(response.data.words);
       })
       .catch(() => {
@@ -120,6 +128,7 @@ class App extends Component {
       rightPanel = <Result data={this.state.data}
                     hoverHandler = {this.handleHover}
                     unHoverHandler = {this.handleUnHover}
+                    clickHandler = {this.handleClick.bind(this)}
                     keywordHandler = {this.handleKeywordSearch}
                     outlines={this.state.outlines}
                     sentiment={this.state.sentiment}/>;
@@ -133,9 +142,11 @@ class App extends Component {
       text={this.state.text}
       inds={this.state.selected_ind}
       sentences={this.state.sentences}
+      returns={this.state.returns}
       hover={this.state.hover}
     />
 
+    console.log(this.state.sentences)
     return (
       <div className="App" style={{ height: "100vh" }}>
         <Layout className="layout" style={{ height: "6vh" }}>
