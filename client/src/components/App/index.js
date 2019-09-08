@@ -20,6 +20,9 @@ class App extends Component {
       isEditable: true,
       text: "",
       data: null,
+      outlines: [],
+      sentiment: 0,
+      text: "",
       sentences: [],
       selected_ind: [],
       hover: [-1,-1]
@@ -44,7 +47,7 @@ class App extends Component {
         for (var i = 0; i < response.data.topics.length; i++) {
           selected_ind.push(response.data.topics[i].ind);
         }
-        this.setState({selected_ind: selected_ind});
+        this.setState({selected_ind: selected_in, outlines: outlines, sentiment: (response.data.sentiment + 1) * 50});
       })
       .catch(() => {
         console.log("response error!!!");
@@ -65,13 +68,17 @@ class App extends Component {
   }
 
   render() {
+
+    console.log(this.state.sentiment);
     let rightPanel;
     if (this.state.isEditable) {
       rightPanel = <RightPanel isLoading={this.state.isLoading}/>;
     } else {
       rightPanel = <Result data={this.state.data}
                     hoverHandler = {this.handleHover}
-                    unHoverHandler = {this.handleUnHover}/>;
+                    unHoverHandler = {this.handleUnHover}
+                    outlines={this.state.outlines}
+                    sentiment={this.state.sentiment}/>;
     }
 
     let leftPanel = <LeftPanel
