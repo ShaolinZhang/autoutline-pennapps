@@ -49,7 +49,7 @@ class Result extends Component {
     return (
       <div>
 
-        <Row style={{margin: "10vh 2vw 0 0"}}>
+        <Row style={{margin: "4vh 2vw 0 0"}}>
           <div style={{margin: "0 20% 0 20%", width: "60%"}}>
             <span style={{fontSize:"1.3em"}}>Sentiment Analysis: {this.props.sentiment.toFixed(2)} out of 100</span>
             <Sentiment sentiment={this.props.sentiment}/>
