@@ -50,13 +50,13 @@ def tokenize(string):
     count = 0
     i = 0
     while i < len(text):
-        if (stop_chars.includes(text.charAt(i))):
+        if text[i] in stop_chars:
             sentences.append(text[left:right+2])
             left = right+2
             count = count + 1
         
         right=i
-        if (text.charAt(i)=='\n'):
+        if (text[i]=='\n'):
             i = i+1
         i = i+1
 
