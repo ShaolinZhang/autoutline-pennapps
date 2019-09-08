@@ -37,7 +37,7 @@ def get_word_embeddings():
 	    word_embeddings[word] = coefs
 	f.close()
 	return word_embeddings
-	
+
 word_embeddings = get_word_embeddings()
 
 # define tokenize string to sentences
@@ -67,29 +67,68 @@ def get_sentence_vectors(sentences):
 
 # define find titles from pagerank values
 def findTitles(scores, sentences):
-    ans = []
-    ind = 0
+    # construct list of sentences sorted by importance scores
+    ranked_sentences = sorted(((scores[i], s) for i,s in enumerate(sentences)), reverse=True)
+
+    # extract top 15% sentences as the summary, and sort by sentence index
+    numOfSen = max(5, int(0.20 * len(sentences)))
+    top_sentences = []
+    for i in range(numOfSen):
+        top_sentences.append((sentences.index(ranked_sentences[i][1]), ranked_sentences[i][1], ranked_sentences[i][0]))
+    top_sentences = sorted(top_sentences, key = lambda top_sentences: top_sentences[0])
+
+    # delete top sentences that are too near to each other
+    current = 1
+    length = len(top_sentences)
+    while current < length:
+        if top_sentences[current][0] - top_sentences[current - 1][0] < 0.02 * len(sentences):
+            if top_sentences[current][2] > top_sentences[current - 1][2]:
+                top_sentences.pop(current - 1)
+            else:
+                top_sentences.pop(current)
+            length -= 1
+        else:
+            current += 1
+
+    # parse paragraphs
+    mid_point = []
+    for i in range(0, len(top_sentences) - 1):
+        left = top_sentences[i][0]
+        right = top_sentences[i + 1][0]
+        sum_real = 0
+        mid_point.append(i)
+        if right == left + 1:
+            mid_point[i] = left
+        else:
+            for j in range(left + 1, right):
+                sum_i = 0
+                for x in range(left + 1, right):
+                    if x <= j:
+                        sum_i += sim_mat[left][x]
+                    else:
+                        sum_i += sim_mat[x][right]
+                if sum_i > sum_real:
+                    sum_real = sum_i
+                    mid_point[i] = j
+
+    # return
+    returned = []
     left = 0
-    right = 0
-    i=1
-    while i<len(scores):
-        if scores[i] > scores[i-1]:
-            left = i-1
-            i = i+1
-            while i<len(scores) and scores[i]>scores[i-1]:
-                i=i+1
-            ind = i-1
-            while i<len(scores) and scores[i]<scores[i-1]:
-                i=i+1
-            right = i-1
-            newTitle = {
-                "ind": ind,
-                "range": [left, right],
-                "string": sentences[ind]
-            }
-            ans.append(newTitle)
-        i=i+1
-    return ans
+    right = mid_point[0]
+    for i in range(len(top_sentences)):
+        newTitle = {
+            "ind": top_sentences[i][0],
+            "range": [left, right],
+            "string": top_sentences[i][1]
+        }
+        returned.append(newTitle)
+        left = right
+        if i == len(top_sentences)-2:
+            right = len(sentences)
+        elif not i == len(top_sentences)-1:
+            right = mid_point[i + 1] 
+
+    return returned
 
 @server.route('/get_outline', methods=['GET', 'POST'])
 def get_outline():
@@ -150,4 +189,3 @@ def get_keyword():
 if __name__ == '__main__':
 	download_glove()
 	server.run(debug=True, port=8000, host='0.0.0.0')
-
