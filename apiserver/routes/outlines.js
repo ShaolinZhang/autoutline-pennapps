@@ -9,9 +9,14 @@ router.post('/', (req, res) => {
           'range': [0,2],
           'ind': 0,
           'string': 'This is a part of the outline.'
+        },
+        {
+          'range': [4,8],
+          'ind': 1,
+          'string': 'This is a part of the outline second.'
         }
       ],
-      sentiment: 0
+      sentiment: -0.32323
     });
 });
 

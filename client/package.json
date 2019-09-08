@@ -12,6 +12,7 @@
     "react-redux": "^7.1.1",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.1.1",
+    "sentence-tokenizer": "^1.0.1",
     "typescript": "^3.6.2"
   },
   "scripts": {

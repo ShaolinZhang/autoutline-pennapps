@@ -13,7 +13,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 import networkx as nx
 import nltk
 from nltk.corpus import stopwords
-from nltk.tokenize import sent_tokenize
 
 from prepare_glove import *
 
@@ -26,6 +25,8 @@ def remove_stopwords(sen):
     sen_new = " ".join([i for i in sen if i not in stop_words])
     return sen_new
 
+download_glove()
+
 # Get pre-trained word_embeddings from glove
 def get_word_embeddings():
 	word_embeddings = {}
@@ -37,15 +38,30 @@ def get_word_embeddings():
 	    word_embeddings[word] = coefs
 	f.close()
 	return word_embeddings
-	
+
 word_embeddings = get_word_embeddings()
 
 # define tokenize string to sentences
 def tokenize(string):
-	sentences = []
-	sentences.append(sent_tokenize(string))
-	sentences = [y for x in sentences for y in x]
-	return sentences
+    stop_chars = ['.', '!', '?']
+    sentences = []
+    left=0
+    right=0
+    count = 0
+    i = 0
+    while i < len(text):
+        if text[i] in stop_chars:
+            sentences.append(text[left:right+2])
+            left = right+2
+            count = count + 1
+        
+        right=i
+        if (text[i]=='\n'):
+            i = i+1
+        i = i+1
+
+    return sentences
+  
 
 # define clean sentences, remove char other than alphabets, tolower(), remove stopwords
 def clean_sentences(sentences):
@@ -65,31 +81,70 @@ def get_sentence_vectors(sentences):
 	    sentence_vectors.append(v)
 	return sentence_vectors
 
-# define find titles from pagerank values
-def findTitles(scores, sentences):
-    ans = []
-    ind = 0
+# define find topics from pagerank values
+def findTopics(scores, sentences):
+    # construct list of sentences sorted by importance scores
+    ranked_sentences = sorted(((scores[i], s) for i,s in enumerate(sentences)), reverse=True)
+
+    # extract top 15% sentences as the summary, and sort by sentence index
+    numOfSen = max(5, int(0.20 * len(sentences)))
+    top_sentences = []
+    for i in range(numOfSen):
+        top_sentences.append((sentences.index(ranked_sentences[i][1]), ranked_sentences[i][1], ranked_sentences[i][0]))
+    top_sentences = sorted(top_sentences, key = lambda top_sentences: top_sentences[0])
+
+    # delete top sentences that are too near to each other
+    current = 1
+    length = len(top_sentences)
+    while current < length:
+        if top_sentences[current][0] - top_sentences[current - 1][0] < 0.02 * len(sentences):
+            if top_sentences[current][2] > top_sentences[current - 1][2]:
+                top_sentences.pop(current - 1)
+            else:
+                top_sentences.pop(current)
+            length -= 1
+        else:
+            current += 1
+
+    # parse paragraphs
+    mid_point = []
+    for i in range(0, len(top_sentences) - 1):
+        left = top_sentences[i][0]
+        right = top_sentences[i + 1][0]
+        sum_real = 0
+        mid_point.append(i)
+        if right == left + 1:
+            mid_point[i] = left
+        else:
+            for j in range(left + 1, right):
+                sum_i = 0
+                for x in range(left + 1, right):
+                    if x <= j:
+                        sum_i += sim_mat[left][x]
+                    else:
+                        sum_i += sim_mat[x][right]
+                if sum_i > sum_real:
+                    sum_real = sum_i
+                    mid_point[i] = j
+
+    # return
+    returned = []
     left = 0
-    right = 0
-    i=1
-    while i<len(scores):
-        if scores[i] > scores[i-1]:
-            left = i-1
-            i = i+1
-            while i<len(scores) and scores[i]>scores[i-1]:
-                i=i+1
-            ind = i-1
-            while i<len(scores) and scores[i]<scores[i-1]:
-                i=i+1
-            right = i-1
-            newTitle = {
-                "ind": ind,
-                "range": [left, right],
-                "string": sentences[ind]
-            }
-            ans.append(newTitle)
-        i=i+1
-    return ans
+    right = mid_point[0]
+    for i in range(len(top_sentences)):
+        newTitle = {
+            "ind": top_sentences[i][0],
+            "range": [left, right],
+            "string": top_sentences[i][1]
+        }
+        returned.append(newTitle)
+        left = right
+        if i == len(top_sentences)-2:
+            right = len(sentences)
+        elif not i == len(top_sentences)-1:
+            right = mid_point[i + 1]
+
+    return returned
 
 @server.route('/get_outline', methods=['GET', 'POST'])
 def get_outline():
@@ -119,7 +174,7 @@ def get_outline():
     encoding_type = enums.EncodingType.UTF8
     response = client.analyze_sentiment(document, encoding_type=encoding_type)
 
-    return jsonify(titles=findTitles(scores, sentences),
+    return jsonify(topics=findTopics(scores, sentences),
     				sentiment=response.document_sentiment.score)
 
 @server.route('/get_keyword', methods=['GET', 'POST'])
@@ -148,6 +203,4 @@ def get_keyword():
 
 
 if __name__ == '__main__':
-	download_glove()
 	server.run(debug=True, port=8000, host='0.0.0.0')
-
