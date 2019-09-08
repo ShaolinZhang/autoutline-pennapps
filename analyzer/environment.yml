@@ -61,5 +61,6 @@ dependencies:
     - requests==2.22.0
     - rsa==4.0
     - urllib3==1.25.3
+    - flask-cors==3.0.7
 prefix: /opt/conda/envs/analyzer
 

@@ -1,12 +1,5 @@
 version: '3'
 services:
-  nginx:
-    restart: always
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./nginx
-    ports:
-      - '3050:80'
   apiserver:
     build:
       dockerfile: Dockerfile.dev
@@ -25,3 +18,12 @@ services:
     build:
       dockerfile: Dockerfile.dev
       context: ./analyzer
+    ports:
+      - '8000:8000'
+  nginx:
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - '3050:80'

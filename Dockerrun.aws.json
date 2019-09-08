@@ -1,0 +1,40 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "containerDefinitions": [
+      {
+        "name": "client",
+        "image": "stephengrider/pennappsxx-client",
+        "hostname": "client",
+        "essential": false,
+        "memory": 128
+      },
+      {
+        "name": "apiserver",
+        "image": "stephengrider/pennappsxx-server",
+        "hostname": "apiserver",
+        "essential": false,
+        "memory": 128
+      },
+      {
+        "name": "analyzer",
+        "image": "stephengrider/pennappsxx-worker",
+        "hostname": "analyzer",
+        "essential": false,
+        "memory": 128
+      },
+      {
+        "name": "nginx",
+        "image": "stephengrider/pennappsxx-nginx",
+        "hostname": "nginx",
+        "essential": true,
+        "portMappings": [
+          {
+            "hostPort": 80,
+            "containerPort": 80
+          }
+        ],
+        "links": ["client", "apiserver"],
+        "memory": 128
+      }
+    ]
+  }

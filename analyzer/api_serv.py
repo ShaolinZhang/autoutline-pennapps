@@ -1,8 +1,10 @@
 import flask, json
 from flask import request
 from flask import jsonify
+from flask_cors import CORS
 
 server = flask.Flask(__name__)
+CORS(server)
 
 from google.cloud import language_v1
 from google.cloud.language_v1 import enums
@@ -15,11 +17,13 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize
 
-from prepare_glove import *
+import prepare_glove
+
 
 nltk.download('punkt')
 nltk.download('stopwords')
 stop_words = stopwords.words('english')
+prepare_glove.download_glove()
 
 # define remove stop words
 def remove_stopwords(sen):
@@ -71,7 +75,7 @@ def findTitles(scores, sentences):
     ranked_sentences = sorted(((scores[i], s) for i,s in enumerate(sentences)), reverse=True)
 
     # extract top 15% sentences as the summary, and sort by sentence index
-    numOfSen = max(5, int(0.20 * len(sentences)))
+    numOfSen = min(len(sentences), max(5, int(0.20 * len(sentences))))
     top_sentences = []
     for i in range(numOfSen):
         top_sentences.append((sentences.index(ranked_sentences[i][1]), ranked_sentences[i][1], ranked_sentences[i][0]))
@@ -187,5 +191,4 @@ def get_keyword():
 
 
 if __name__ == '__main__':
-	download_glove()
 	server.run(debug=True, port=8000, host='0.0.0.0')
