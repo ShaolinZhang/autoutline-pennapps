@@ -30,6 +30,7 @@ class App extends Component {
   }
 
   tokenize(text) {
+    let ans = []
     let stop_chars = ['.', '!', '?']
     let sentences = []
     let returns = []
@@ -45,21 +46,23 @@ class App extends Component {
       right=i
       if (text.charAt(i)==='\n'){
         returns.push(count)
+        i++
       }
     }
 
-    console.log(sentences)
-    console.log(returns)
-    return (sentences, returns)
+    ans.push(sentences)
+    ans.push(returns)
+    return ans
   }
 
   handleSubmit() {
-    this.setState({sentences: this.tokenize(this.state.text)[0]});
-    this.setState({returns: this.tokenize(this.state.text)[1]});
+    let arr = this.tokenize(this.state.text)
+    this.setState({sentences: arr[0]});
+    this.setState({returns: arr[1]});
     this.setState({isLoading: true});
 
     axios
-      .post("/api/outlines", {
+      .post("https://18.219.26.6:8000/get_outline", {
         text: this.state.text
       })
       .then(response => {
@@ -93,10 +96,10 @@ class App extends Component {
     let text = ''
     let i = range[0]
     for (; i<range[1]; i++){
-      text = text + this.state.sentences[i]+' '
+      text = text + this.state.sentences[i]
     }
     axios
-      .post("/api/keywords", {
+      .post("http://18.219.26.6:8000/get_keyword", {
         text: text
       })
       .then(response => {
@@ -109,8 +112,6 @@ class App extends Component {
   }
 
   render() {
-
-    console.log(this.state.sentiment);
     let rightPanel;
     if (this.state.isEditable) {
       rightPanel = <RightPanel isLoading={this.state.isLoading}/>;
