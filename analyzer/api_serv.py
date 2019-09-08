@@ -26,6 +26,8 @@ def remove_stopwords(sen):
     sen_new = " ".join([i for i in sen if i not in stop_words])
     return sen_new
 
+download_glove()
+
 # Get pre-trained word_embeddings from glove
 def get_word_embeddings():
 	word_embeddings = {}
@@ -65,8 +67,8 @@ def get_sentence_vectors(sentences):
 	    sentence_vectors.append(v)
 	return sentence_vectors
 
-# define find titles from pagerank values
-def findTitles(scores, sentences):
+# define find topics from pagerank values
+def findTopics(scores, sentences):
     # construct list of sentences sorted by importance scores
     ranked_sentences = sorted(((scores[i], s) for i,s in enumerate(sentences)), reverse=True)
 
@@ -126,7 +128,7 @@ def findTitles(scores, sentences):
         if i == len(top_sentences)-2:
             right = len(sentences)
         elif not i == len(top_sentences)-1:
-            right = mid_point[i + 1] 
+            right = mid_point[i + 1]
 
     return returned
 
@@ -158,7 +160,7 @@ def get_outline():
     encoding_type = enums.EncodingType.UTF8
     response = client.analyze_sentiment(document, encoding_type=encoding_type)
 
-    return jsonify(titles=findTitles(scores, sentences),
+    return jsonify(topics=findTopics(scores, sentences),
     				sentiment=response.document_sentiment.score)
 
 @server.route('/get_keyword', methods=['GET', 'POST'])
@@ -187,5 +189,4 @@ def get_keyword():
 
 
 if __name__ == '__main__':
-	download_glove()
 	server.run(debug=True, port=8000, host='0.0.0.0')

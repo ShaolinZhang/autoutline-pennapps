@@ -10,11 +10,12 @@ class Result extends Component {
   renderPanels() {
     return this.props.data.topics.map((topic, i) => {
       let range = topic.range
+      let keywords = this.props.keywordHandler(range)
       return (
         <Panel header={topic["string"]} key={i}
-          style={{height: "100%", width: "90%"}} onClick={() => this.props.onKeywordSearch()}>
+          style={{height: "100%", width: "90%"}}>
           <p onMouseEnter={()=>this.props.hoverHandler(range)}
-          onMouseLeave={()=>this.props.unHoverHandler()}>Placeholder!</p>
+          onMouseLeave={()=>this.props.unHoverHandler()}>{keywords}</p>
         </Panel>
       )
     })

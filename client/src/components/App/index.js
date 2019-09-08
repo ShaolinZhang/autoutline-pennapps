@@ -9,9 +9,6 @@ import LeftPanel from "../LeftPanel";
 import RightPanel from "../RightPanel";
 import Result from "../Result";
 
-var Tokenizer = require('sentence-tokenizer');
-var tokenizer = new Tokenizer('Chuck');
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -22,6 +19,7 @@ class App extends Component {
       data: null,
       sentiment: 0,
       sentences: [],
+      returns: [],
       selected_ind: [],
       hover: [-1,-1]
     };
@@ -31,10 +29,35 @@ class App extends Component {
     this.handleKeywordSearch = this.handleKeywordSearch.bind(this);
   }
 
+  tokenize(text) {
+    let stop_chars = ['.', '!', '?']
+    let sentences = []
+    let returns = []
+    let left=0
+    let right=0
+    let count = 0
+    for (var i = 0; i < text.length; i++) {
+      if (stop_chars.includes(text.charAt(i))) {
+        sentences.push(text.substring(left, right+2))
+        left = right+2
+        count++
+      }
+      right=i
+      if (text.charAt(i)==='\n'){
+        returns.push(count)
+      }
+    }
+
+    console.log(sentences)
+    console.log(returns)
+    return (sentences, returns)
+  }
+
   handleSubmit() {
-    tokenizer.setEntry(this.state.text);
-    this.setState({sentences: tokenizer.getSentences()});
-    this.setState({ isLoading: true });
+    this.setState({sentences: this.tokenize(this.state.text)[0]});
+    this.setState({returns: this.tokenize(this.state.text)[1]});
+    this.setState({isLoading: true});
+
     axios
       .post("/api/outlines", {
         text: this.state.text
@@ -66,10 +89,22 @@ class App extends Component {
     this.setState({hover: [-1,-1]})
   }
 
-  handleKeywordSearch() {
+  handleKeywordSearch(range) {
+    let text = ''
+    let i = range[0]
+    for (; i<range[1]; i++){
+      text = text + this.state.sentences[i]+' '
+    }
     axios
       .post("/api/keywords", {
-        // to be completed
+        text: text
+      })
+      .then(response => {
+        console.log("keyword response data:", response.data);
+        return response.data.words
+      })
+      .catch(() => {
+        console.log("response error!!!");
       });
   }
 
@@ -83,6 +118,7 @@ class App extends Component {
       rightPanel = <Result data={this.state.data}
                     hoverHandler = {this.handleHover}
                     unHoverHandler = {this.handleUnHover}
+                    keywordHandler = {this.handleKeywordSearch}
                     outlines={this.state.outlines}
                     sentiment={this.state.sentiment}/>;
     }
