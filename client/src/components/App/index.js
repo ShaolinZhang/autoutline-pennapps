@@ -9,21 +9,33 @@ import LeftPanel from "../LeftPanel";
 import RightPanel from "../RightPanel";
 import Result from "../Result";
 
+var Tokenizer = require('sentence-tokenizer');
+var tokenizer = new Tokenizer('Chuck');
+
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isLoading: false,
       isEditable: true,
+      text: "",
       data: null,
       outlines: [],
       sentiment: 0,
-      text: ""
+      text: "",
+      sentences: [],
+      selected_ind: [],
+      hover: [-1,-1]
     };
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleHover = this.handleHover.bind(this)
+    this.handleUnHover = this.handleUnHover.bind(this)
   }
 
   handleSubmit() {
+    tokenizer.setEntry(this.state.text)
+    this.setState({sentences: tokenizer.getSentences()});
+    this.setState({ isLoading: true });
     axios
       .post("/api/outlines", {
         text: this.state.text
@@ -31,21 +43,28 @@ class App extends Component {
       .then(response => {
         console.log("response data:", response.data);
         this.setState({ data: response.data, isLoading: false, isEditable: false });
-        var outlines = [];
+        let selected_ind = [];
         for (var i = 0; i < response.data.topics.length; i++) {
-          outlines.push(response.data.topics[i].string);
+          selected_ind.push(response.data.topics[i].ind);
         }
-        this.setState({outlines: outlines, sentiment: (response.data.sentiment + 1) * 50});
+        this.setState({selected_ind: selected_in, outlines: outlines, sentiment: (response.data.sentiment + 1) * 50});
       })
       .catch(() => {
         console.log("response error!!!");
         this.setState({ data: null, isLoading: false });
       });
-    this.setState({ isLoading: true });
   }
 
   handleEdit() {
     this.setState({ data: null, isLoading: false, isEditable: true });
+  }
+
+  handleHover(range) {
+    this.setState({hover: range})
+  }
+
+  handleUnHover() {
+    this.setState({hover: [-1,-1]})
   }
 
   render() {
@@ -53,17 +72,25 @@ class App extends Component {
     console.log(this.state.sentiment);
     let rightPanel;
     if (this.state.isEditable) {
-      rightPanel = <RightPanel
-        isLoading={this.state.isLoading}
-        data={this.state.data}
-        outlines={this.state.outlines}
-      />;
+      rightPanel = <RightPanel isLoading={this.state.isLoading}/>;
     } else {
-      rightPanel = <Result
-        outlines={this.state.outlines}
-        sentiment={this.state.sentiment}
-      />;
+      rightPanel = <Result data={this.state.data}
+                    hoverHandler = {this.handleHover}
+                    unHoverHandler = {this.handleUnHover}
+                    outlines={this.state.outlines}
+                    sentiment={this.state.sentiment}/>;
     }
+
+    let leftPanel = <LeftPanel
+      onChange={e => this.setState({ text: e.target.value })}
+      onSubmit={this.handleSubmit.bind(this)}
+      onEdit={this.handleEdit.bind(this)}
+      isEditable={this.state.isEditable}
+      text={this.state.text}
+      inds={this.state.selected_ind}
+      sentences={this.state.sentences}
+      hover={this.state.hover}
+    />
 
     return (
       <div className="App" style={{ height: "100vh" }}>
@@ -72,12 +99,7 @@ class App extends Component {
         </Layout>
         <Row>
           <Col span={12} style={{ height: "92vh" }}>
-            <LeftPanel
-              text={this.state.text}
-              onChange={e => this.setState({ text: e.target.value })}
-              onSubmit={this.handleSubmit.bind(this)}
-              onEdit={this.handleEdit.bind(this)}
-            />
+            {leftPanel}
           </Col>
           <Col span={12} style={{ height: "92vh" }}>
             {rightPanel}
