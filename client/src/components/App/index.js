@@ -17,6 +17,7 @@ class App extends Component {
       isEditable: true,
       data: null,
       outlines: [],
+      sentiment: 0,
       text: ""
     };
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -34,7 +35,7 @@ class App extends Component {
         for (var i = 0; i < response.data.topics.length; i++) {
           outlines.push(response.data.topics[i].string);
         }
-        this.setState({outlines: outlines});
+        this.setState({outlines: outlines, sentiment: (response.data.sentiment + 1) * 50});
       })
       .catch(() => {
         console.log("response error!!!");
@@ -48,6 +49,8 @@ class App extends Component {
   }
 
   render() {
+
+    console.log(this.state.sentiment);
     let rightPanel;
     if (this.state.isEditable) {
       rightPanel = <RightPanel
@@ -58,6 +61,7 @@ class App extends Component {
     } else {
       rightPanel = <Result
         outlines={this.state.outlines}
+        sentiment={this.state.sentiment}
       />;
     }
 
