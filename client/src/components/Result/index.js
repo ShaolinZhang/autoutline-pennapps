@@ -10,10 +10,13 @@ class Result extends Component {
   }
 
   renderPanels() {
-    return this.props.outlines.map((outline, i) => {
+    return this.props.data.topics.map((topic, i) => {
+      let range = topic.range
       return (
-        <Panel header={outline} key={i} style={{height: "100%", width: "90%"}}>
-          <p>Placeholder!</p>
+        <Panel header={topic["string"]} key={i} 
+          style={{height: "100%", width: "90%"}}>
+          <p onMouseEnter={()=>this.props.hoverHandler(range)}
+          onMouseLeave={()=>this.props.unHoverHandler()}>Placeholder!</p>
         </Panel>
       )
     })
